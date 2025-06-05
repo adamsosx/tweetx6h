@@ -1,25 +1,26 @@
-name: Run Twitter Bot
+name: Token Tweet (Every 6 Hours) # Zmieniona nazwa dla jasności
 
 on:
   schedule:
-    # Uruchamia workflow co 6 godzin
+    # Uruchamia workflow co 6 godzin.
     # Składnia cron: minuta godzina dzień-miesiąca miesiąc dzień-tygodnia
     # '0 */6 * * *' oznacza "o zerowej minucie, co szóstą godzinę, każdego dnia, każdego miesiąca, każdego dnia tygodnia"
+    # Przykładowe godziny uruchomienia (UTC): 00:00, 06:00, 12:00, 18:00
     - cron: '0 */6 * * *'
   workflow_dispatch: # Umożliwia ręczne uruchomienie workflow z zakładki Actions
 
 jobs:
-  run-python-script:
+  tweet-top-tokens:
     runs-on: ubuntu-latest # Użyj najnowszego dostępnego środowiska Ubuntu
 
     steps:
       - name: Check out repository code
-        uses: actions/checkout@v4 # Użyj najnowszej wersji akcji checkout
+        uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v5 # Użyj najnowszej wersji akcji setup-python
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.10' # Możesz wybrać wersję Pythona, której używasz
+          python-version: '3.10' # Możesz wybrać wersję Pythona
 
       - name: Install dependencies
         run: |
@@ -27,12 +28,9 @@ jobs:
           pip install -r requirements.txt
 
       - name: Run bot script
-        # Tutaj przekazujemy sekrety jako zmienne środowiskowe
         env:
           TWITTER_API_KEY: ${{ secrets.TWITTER_API_KEY }}
           TWITTER_API_SECRET: ${{ secrets.TWITTER_API_SECRET }}
           TWITTER_ACCESS_TOKEN: ${{ secrets.TWITTER_ACCESS_TOKEN }}
           TWITTER_ACCESS_TOKEN_SECRET: ${{ secrets.TWITTER_ACCESS_TOKEN_SECRET }}
-          # Jeśli używasz zmiennych Actions:
-          # RADAR_TIMEFRAME_CONFIG_ENV_VAR: ${{ vars.RADAR_TIMEFRAME_CONFIG }} 
         run: python bot.py

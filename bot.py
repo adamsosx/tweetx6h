@@ -27,8 +27,6 @@ RADAR_API_URL = "https://radar.fun/api/tokens/most-called?timeframe=6h"
 def get_top_tokens():
     """Pobiera dane z API radar.fun i zwraca top 3 tokeny."""
     try:
-        # verify=False jest niezalecane w produkcji, ale było w obu skryptach.
-        # Rozważ uzyskanie certyfikatu dla radar.fun lub dodanie go do zaufanych.
         response = requests.get(RADAR_API_URL, verify=False, timeout=30)
         response.raise_for_status()  # Wywoła wyjątek dla kodów błędu HTTP 4xx/5xx
         data = response.json()
@@ -75,8 +73,8 @@ def format_main_tweet(top_3_tokens):
 
 def format_reply_tweet():
     """Format the reply tweet with the link."""
-    return "🔗 https://outlight.fun/ #SOL #Outlight" # Zgodnie z drugim skryptem
-
+    return "🔗 https://outlight.fun/\n#SOL #Outlight"
+    
 def main():
     logging.info(f"Starting X Bot (single run for scheduled task, timeframe: 6h)...")
     

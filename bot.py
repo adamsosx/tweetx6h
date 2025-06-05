@@ -1,7 +1,7 @@
 import tweepy
 import requests
 import json
-import os 
+import os # Dodano import os do odczytu zmiennych środowiskowych
 from datetime import datetime
 import logging
 
@@ -20,14 +20,15 @@ API_SECRET_ENV = os.getenv("TWITTER_API_SECRET")
 ACCESS_TOKEN_ENV = os.getenv("TWITTER_ACCESS_TOKEN")
 ACCESS_TOKEN_SECRET_ENV = os.getenv("TWITTER_ACCESS_TOKEN_SECRET")
 
-RADAR_API_TIMEFRAME = "6H" 
+RADAR_API_TIMEFRAME = "6H" # 
 RADAR_API_URL = f"https://radar.fun/api/tokens/most-called?timeframe={RADAR_API_TIMEFRAME}"
 
 def get_top_tokens():
     """Pobiera dane z API radar.fun i zwraca top 3 tokeny"""
     logging.info(f"Fetching top tokens from {RADAR_API_URL}")
     try:
-       meout=30)
+        
+        response = requests.get(RADAR_API_URL, verify=False, timeout=30)
         response.raise_for_status()
         data = response.json()
         
@@ -73,6 +74,7 @@ def get_top_tokens():
 
 def format_tweet(top_3_tokens):
     """Format tweet with top 3 tokens"""
+    # Nagłówek tweeta i timeframe są zgodne z Twoim skryptem
     tweet = f"Top3 Most Called Tokens ({RADAR_API_TIMEFRAME})\n\n" 
     
     for i, token in enumerate(top_3_tokens, 1):
@@ -92,7 +94,7 @@ def main():
     
     if not all([API_KEY_ENV, API_SECRET_ENV, ACCESS_TOKEN_ENV, ACCESS_TOKEN_SECRET_ENV]):
         logging.error("Twitter API credentials not found in environment variables. Exiting.")
-        print("Error: Twitter API credentials must be set as environment variables.") # Dodano dla lokalnego uruchomienia
+        print("Error: Twitter API credentials must be set as environment variables.") 
         exit(1)
 
     try:

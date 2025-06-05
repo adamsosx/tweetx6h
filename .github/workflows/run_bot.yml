@@ -1,17 +1,13 @@
-name: Token Tweet (Every 6 Hours) # Zmieniona nazwa dla jasności
+name: Token Tweet (Every 6 Hours)
 
 on:
   schedule:
-    # Uruchamia workflow co 6 godzin.
-    # Składnia cron: minuta godzina dzień-miesiąca miesiąc dzień-tygodnia
-    # '0 */6 * * *' oznacza "o zerowej minucie, co szóstą godzinę, każdego dnia, każdego miesiąca, każdego dnia tygodnia"
-    # Przykładowe godziny uruchomienia (UTC): 00:00, 06:00, 12:00, 18:00
-    - cron: '0 */6 * * *'
-  workflow_dispatch: # Umożliwia ręczne uruchomienie workflow z zakładki Actions
+    - cron: '0 */6 * * *' # Co 6 godzin
+  workflow_dispatch:
 
 jobs:
   tweet-top-tokens:
-    runs-on: ubuntu-latest # Użyj najnowszego dostępnego środowiska Ubuntu
+    runs-on: ubuntu-latest
 
     steps:
       - name: Check out repository code
@@ -20,7 +16,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.10' # Możesz wybrać wersję Pythona
+          python-version: '3.10'
 
       - name: Install dependencies
         run: |

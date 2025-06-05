@@ -5,7 +5,6 @@ import os
 from datetime import datetime
 import logging
 
-# Konfiguracja logowania
 LOG_FILENAME = 'bot.log' 
 logging.basicConfig(
     level=logging.INFO,
@@ -21,7 +20,7 @@ API_SECRET_ENV = os.getenv("TWITTER_API_SECRET")
 ACCESS_TOKEN_ENV = os.getenv("TWITTER_ACCESS_TOKEN")
 ACCESS_TOKEN_SECRET_ENV = os.getenv("TWITTER_ACCESS_TOKEN_SECRET")
 
-RADAR_API_TIMEFRAME = "6h" 
+RADAR_API_TIMEFRAME = "6H" 
 RADAR_API_URL = f"https://radar.fun/api/tokens/most-called?timeframe={RADAR_API_TIMEFRAME}"
 
 def get_top_tokens():
@@ -74,7 +73,6 @@ def get_top_tokens():
 
 def format_tweet(top_3_tokens):
     """Format tweet with top 3 tokens"""
-    # Nagłówek tweeta i timeframe są zgodne z Twoim skryptem
     tweet = f"Top3 Most Called Tokens ({RADAR_API_TIMEFRAME})\n\n" 
     
     for i, token in enumerate(top_3_tokens, 1):

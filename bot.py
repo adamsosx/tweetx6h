@@ -1,7 +1,7 @@
 import tweepy
 import requests
 import json
-import os # Dodano import os do odczytu zmiennych środowiskowych
+import os 
 from datetime import datetime
 import logging
 
@@ -12,7 +12,7 @@ logging.basicConfig(
     format='%(asctime)s - %(levelname)s - %(message)s',
     handlers=[
         logging.FileHandler(LOG_FILENAME),
-        logging.StreamHandler() # Dodatkowo loguje do konsoli, przydatne w GitHub Actions
+        logging.StreamHandler() 
     ]
 )
 
@@ -21,7 +21,7 @@ API_SECRET_ENV = os.getenv("TWITTER_API_SECRET")
 ACCESS_TOKEN_ENV = os.getenv("TWITTER_ACCESS_TOKEN")
 ACCESS_TOKEN_SECRET_ENV = os.getenv("TWITTER_ACCESS_TOKEN_SECRET")
 
-RADAR_API_TIMEFRAME = "6h" # Zgodnie z Twoim ostatnim skryptem
+RADAR_API_TIMEFRAME = "6h" 
 RADAR_API_URL = f"https://radar.fun/api/tokens/most-called?timeframe={RADAR_API_TIMEFRAME}"
 
 def get_top_tokens():

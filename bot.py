@@ -76,33 +76,27 @@ def get_top_tokens():
         return None
 
 def format_tweet(top_3_tokens):
-    """Formatowanie tweeta z top 3 tokenami."""
-    if not top_3_tokens:
-        return "Could not retrieve token data at this time. #error"
-
-    # Dynamiczne pobranie klucza dla liczby wywołań
-    calls_key = f"calls_{RADAR_API_TIMEFRAME.replace('h', '')}h"
-
-    tweet_lines = [f"💎 Top 3 Most Called Tokens ({RADAR_API_TIMEFRAME} - radar.fun) 💎\n"]
+    """Format tweet with top 3 tokens"""
+    tweet = "Top3 Most Called Tokens (6h)\n\n"
     
     for i, token in enumerate(top_3_tokens, 1):
-        # Użyj 'N/A' jako wartości domyślnej, jeśli brakuje danych
-        symbol = token.get('symbol', 'N/A')
-        address = token.get('address', 'N/A')
-        # Użyj dynamicznego klucza do pobrania liczby wywołań, z fallbackiem na 0
-        calls = token.get(calls_key, token.get('calls_1h', 0)) # Fallback do calls_1h jeśli dynamiczny nie istnieje
+        calls = token.get('unique_channels', 0)
+        symbol = token.get('symbol', 'Unknown')
+        address = token.get('address', 'No Address Provided') 
         
-        # Format: "1. $SYMBOL"
-        tweet_lines.append(f"{i}. ${symbol}")
-        # Format: "   Address: {address}"
-        tweet_lines.append(f"   Address: {address}")
-        # Format: "   Calls: {calls}"
-        tweet_lines.append(f"   Calls: {calls}\n") # Dodatkowa nowa linia dla czytelności
+        # Format: "1. $symbol"
+        tweet += f"{i}. ${symbol}\n"
+        
+        # Format: "   {address}"
+        tweet += f"   {address}\n"
+        
+        # Format: "   X calls" with two newlines after
+        tweet += f"   {calls} calls\n\n"
     
-    tweet_lines.append("Powered by outlight.fun")
-    tweet_lines.append("#Crypto #Tokens #TradingSignals") # Dodatkowe hashtagi
+    # Add footer with SOL and outlight.fun
+    tweet += "\n outlight.fun\n"
     
-    return "\n".join(tweet_lines)
+    return tweet
 
 def main():
     logging.info("Starting Radar.fun Twitter Bot...")

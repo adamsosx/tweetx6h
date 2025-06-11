@@ -22,17 +22,17 @@ API_SECRET_ENV = os.getenv("TWITTER_API_SECRET")
 ACCESS_TOKEN_ENV = os.getenv("TWITTER_ACCESS_TOKEN")
 ACCESS_TOKEN_SECRET_ENV = os.getenv("TWITTER_ACCESS_TOKEN_SECRET")
 
-RADAR_API_URL = "https://outlight.fun/api/tokens/most-called?timeframe=6h"
+OUTLIGHT_API_URL = "https://outlight.fun/api/tokens/most-called?timeframe=6h"
 
 def get_top_tokens():
-    """Pobiera dane z API radar.fun i zwraca top 3 tokeny."""
+    """Pobiera dane z API outlight.fun i zwraca top 3 tokeny."""
     try:
-        response = requests.get(RADAR_API_URL, verify=False, timeout=30)
+        response = requests.get(OUTLIGHT_API_URL, verify=False, timeout=30)
         response.raise_for_status()  # Wywoła wyjątek dla kodów błędu HTTP 4xx/5xx
         data = response.json()
         
         if not isinstance(data, list):
-            logging.error(f"API response from radar.fun is not a list, got: {type(data)}. Content: {data}")
+            logging.error(f"API response from outlight.fun is not a list, got: {type(data)}. Content: {data}")
             return None
 
         # Sortujemy tokeny według liczby unikalnych kanałów
@@ -42,13 +42,13 @@ def get_top_tokens():
         top_3 = sorted_tokens[:3]
         return top_3
     except requests.exceptions.HTTPError as e:
-        logging.error(f"HTTP error fetching data from radar.fun API: {e}. Response: {e.response.text if e.response else 'N/A'}")
+        logging.error(f"HTTP error fetching data from outlight.fun API: {e}. Response: {e.response.text if e.response else 'N/A'}")
         return None
     except requests.exceptions.RequestException as e:
-        logging.error(f"Request error fetching data from radar.fun API: {e}")
+        logging.error(f"Request error fetching data from outlight.fun API: {e}")
         return None
     except json.JSONDecodeError as e:
-        logging.error(f"JSON decode error from radar.fun API: {e}. Response text: {response.text if 'response' in locals() else 'N/A'}")
+        logging.error(f"JSON decode error from outlight.fun API: {e}. Response text: {response.text if 'response' in locals() else 'N/A'}")
         return None
     except Exception as e:
         logging.error(f"Unexpected error in get_top_tokens: {e}")

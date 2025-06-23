@@ -1,4 +1,5 @@
 import tweepy
+import time
 import requests
 import json
 from datetime import datetime, timezone # Dodano timezone dla UTC
@@ -69,6 +70,36 @@ def format_link_tweet():
     """Format the link tweet (reply)"""
     return "\ud83e\uddea Data from: \ud83d\udd17 https://outlight.fun/\n#SOL #Outlight #TokenCalls "
 
+def create_tweets_with_rate_limit(client, tweets_to_send):
+    """
+    Send tweets with proper rate limiting
+    """
+    for tweet in tweets_to_send:
+        try:
+            response = client.create_tweet(text=tweet)
+            logging.info(f"Tweet sent successfully: {response.data['id']}")
+            # Wait at least 60 seconds between tweets to avoid rate limits
+            time.sleep(60)  # 60 seconds = 1 minute
+        except tweepy.TooManyRequests as e:
+            # Get the reset time from the error response
+            reset_time = int(e.response.headers.get('x-rate-limit-reset', 0))
+            current_time = int(time.time())
+            # Calculate wait time (add 10 seconds buffer)
+            wait_time = max(reset_time - current_time + 10, 60)
+            
+            logging.error(f"Rate limit exceeded. Waiting {wait_time} seconds")
+            time.sleep(wait_time)
+            # Retry the tweet after waiting
+            try:
+                response = client.create_tweet(text=tweet)
+                logging.info(f"Tweet sent successfully after waiting: {response.data['id']}")
+            except Exception as retry_e:
+                logging.error(f"Failed to send tweet even after waiting: {retry_e}")
+        except Exception as e:
+            logging.error(f"Error sending tweet: {e}")
+            # Wait before trying the next tweet anyway
+            time.sleep(60)
+
 def main():
     logging.info("GitHub Action: Bot execution started.")
 
@@ -134,6 +165,10 @@ def main():
         main_tweet_id = response_main_tweet.data['id']
         logging.info(f"Main tweet sent successfully! Tweet ID: {main_tweet_id}, Link: https://twitter.com/{me.data.username}/status/{main_tweet_id}")
 
+        # Wait at least 60 seconds before sending reply
+        logging.info("Waiting 60 seconds before sending reply tweet...")
+        time.sleep(60)
+
         # Przygotowanie i wysłanie tweeta z linkiem jako odpowiedzi (z grafiką)
         link_tweet_text = format_link_tweet()
         logging.info(f"Prepared reply tweet ({len(link_tweet_text)} chars):")
@@ -158,20 +193,56 @@ def main():
                 logging.error(f"Error uploading reply image: {e}. Sending reply without image.")
                 reply_media_id = None
 
-        if reply_media_id:
-            response_reply_tweet = client.create_tweet(
-                text=link_tweet_text,
-                in_reply_to_tweet_id=main_tweet_id,
-                media_ids=[reply_media_id]
-            )
-        else:
-            response_reply_tweet = client.create_tweet(
-                text=link_tweet_text,
-                in_reply_to_tweet_id=main_tweet_id
-            )
-        reply_tweet_id = response_reply_tweet.data['id']
-        logging.info(f"Reply tweet sent successfully! Tweet ID: {reply_tweet_id}, Link: https://twitter.com/{me.data.username}/status/{reply_tweet_id}")
+        # Send reply tweet with rate limit handling
+        try:
+            if reply_media_id:
+                response_reply_tweet = client.create_tweet(
+                    text=link_tweet_text,
+                    in_reply_to_tweet_id=main_tweet_id,
+                    media_ids=[reply_media_id]
+                )
+            else:
+                response_reply_tweet = client.create_tweet(
+                    text=link_tweet_text,
+                    in_reply_to_tweet_id=main_tweet_id
+                )
+            reply_tweet_id = response_reply_tweet.data['id']
+            logging.info(f"Reply tweet sent successfully! Tweet ID: {reply_tweet_id}, Link: https://twitter.com/{me.data.username}/status/{reply_tweet_id}")
 
+        except tweepy.TooManyRequests as e:
+            # Obsługa rate limit dla reply tweeta
+            reset_time = int(e.response.headers.get('x-rate-limit-reset', 0))
+            current_time = int(time.time())
+            wait_time = max(reset_time - current_time + 10, 60)
+            
+            logging.error(f"Rate limit exceeded when sending reply. Waiting {wait_time} seconds before retrying...")
+            time.sleep(wait_time)
+            
+            # Retry sending reply tweet
+            try:
+                if reply_media_id:
+                    response_reply_tweet = client.create_tweet(
+                        text=link_tweet_text,
+                        in_reply_to_tweet_id=main_tweet_id,
+                        media_ids=[reply_media_id]
+                    )
+                else:
+                    response_reply_tweet = client.create_tweet(
+                        text=link_tweet_text,
+                        in_reply_to_tweet_id=main_tweet_id
+                    )
+                reply_tweet_id = response_reply_tweet.data['id']
+                logging.info(f"Reply tweet sent successfully after waiting! Tweet ID: {reply_tweet_id}, Link: https://twitter.com/{me.data.username}/status/{reply_tweet_id}")
+            except Exception as retry_e:
+                logging.error(f"Failed to send reply tweet even after waiting: {retry_e}")
+
+    except tweepy.TooManyRequests as e:
+        # Obsługa rate limit dla głównego tweeta
+        reset_time = int(e.response.headers.get('x-rate-limit-reset', 0))
+        current_time = int(time.time())
+        wait_time = max(reset_time - current_time + 10, 60)
+        logging.error(f"Rate limit exceeded when sending main tweet. Need to wait {wait_time} seconds before retrying")
+        # Tutaj możesz dodać time.sleep(wait_time) i retry logic jeśli chcesz
     except tweepy.TweepyException as e:
         logging.error(f"Twitter API error sending tweet: {e}")
     except Exception as e:

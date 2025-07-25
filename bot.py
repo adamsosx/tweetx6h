@@ -23,7 +23,7 @@ access_token = os.getenv("TWITTER_ACCESS_TOKEN")
 access_token_secret = os.getenv("TWITTER_ACCESS_TOKEN_SECRET")
 
 # URL API outlight.fun - z pierwszego kodu (6h timeframe)
-OUTLIGHT_API_URL = "https://outlight.fun/api/tokens/most-called?timeframe=6h"
+OUTLIGHT_API_URL = "https://old.outlight.fun/api/tokens/most-called?timeframe=6h"
 
 def get_top_tokens():
     """Pobiera dane z API outlight.fun i zwraca top 3 tokeny, licząc tylko kanały z win_rate > 30%"""

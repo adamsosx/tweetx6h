@@ -55,16 +55,16 @@ def format_tweet(top_3_tokens):
     """Format tweet with top 3 tokens (tylko calls z win_rate > 30%)"""
     # Rotating headers for main tweet
     headers = [
-        "🧠 Monty Log Dump - Top Called 1h",
-        "🚨 Most Called Tokens 1h",
-        "📟 Monty Watch: 1h 📞 Frenzy",
+        "🧠 Monty Log Dump - Top Called 6h",
+        "🚨 Most Called Tokens 6h",
+        "📟 Monty Watch: 6h 📞 Frenzy",
         "🎯 Top Degen Focus (Callers)",
         "🤖 Monty Scraped This for You:",
-        "📞 1h Top Called Leaderboard:",
+        "📞 6h Top Called Leaderboard:",
         "📡 Last 10h: Most Called Projects",
-        "📞 Degens are loud af Top 1h Calls:",
-        "📞 Monty Call Sheet  1h",
-        "🚨 1h Top Callers Report"
+        "📞 Degens are loud af Top 6h Calls:",
+        "📞 Monty Call Sheet  6h",
+        "🚨 6h Top Callers Report"
     ]
     
     # Use current timestamp to rotate headers

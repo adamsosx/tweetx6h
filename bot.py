@@ -28,7 +28,7 @@ OUTLIGHT_API_URL = "https://old.outlight.fun/api/tokens/most-called?timeframe=6h
 def get_top_tokens():
     """Pobiera dane z API outlight.fun i zwraca top 3 tokeny, licząc tylko kanały z win_rate > 30%"""
     try:
-        response = requests.get(OUTLIGHT_API_URL, verify=False)
+        response = requests.get(OUTLIGHT_API_URL)
         response.raise_for_status()
         data = response.json()
 
@@ -53,7 +53,25 @@ def get_top_tokens():
 
 def format_tweet(top_3_tokens):
     """Format tweet with top 3 tokens (tylko calls z win_rate > 30%)"""
-    tweet = f"🚀Top 3 Most 📞 6h\n\n"
+    # Rotating headers for main tweet
+    headers = [
+        "🧠 Monty Log Dump - Top Called 1h",
+        "🚨 Most Called Tokens 1h",
+        "📟 Monty Watch: 1h 📞 Frenzy",
+        "🎯 Top Degen Focus (Callers)",
+        "🤖 Monty Scraped This for You:",
+        "📞 1h Top Called Leaderboard:",
+        "📡 Last 10h: Most Called Projects",
+        "📞 Degens are loud af Top 1h Calls:",
+        "📞 Monty Call Sheet  1h",
+        "🚨 1h Top Callers Report"
+    ]
+    
+    # Use current timestamp to rotate headers
+    current_hour = datetime.now().hour
+    selected_header = headers[current_hour % len(headers)]
+    
+    tweet = f"{selected_header}\n\n"
     medals = ['🥇', '🥈', '🥉']
     for i, token in enumerate(top_3_tokens, 0):
         calls = token.get('filtered_calls', 0)
@@ -64,11 +82,30 @@ def format_tweet(top_3_tokens):
         tweet += f"{address}\n"
         tweet += f"📞 {calls}\n\n"
     tweet = tweet.rstrip('\n')
+    tweet += "\n\n1/2"
     return tweet
 
 def format_link_tweet():
     """Format the link tweet (reply)"""
-    return "\ud83e\uddea Data from: \ud83d\udd17 https://outlight.fun/\n#SOL #Outlight #TokenCalls "
+    # Rotating messages for reply tweet
+    messages = [
+        "Degeneracy is alive and WELL 📞📞📞",
+        "Called more than your ex",
+        "Is it conviction or just click addiction?",
+        "High call count = high cope?",
+        "Get in or get laughed at",
+        "Chart going up? no clue. calls going beep",
+        "Zero fundamentals, max vibes",
+        "Calls mean nothing, but they do mean something",
+        "Degens only sleep when their wallets do 💤",
+        "Nothing but vibes & unpaid interns 📞"
+    ]
+    
+    # Use current minute to rotate messages
+    current_minute = datetime.now().minute
+    selected_message = messages[current_minute % len(messages)]
+    
+    return f"2/2\n\n{selected_message}\n\n🧪 Data from: 🔗 https://outlight.fun/\n\n#SOL #Outlight #TokenCalls"
 
 def create_tweets_with_rate_limit(client, tweets_to_send):
     """
@@ -251,15 +288,4 @@ def main():
     logging.info("GitHub Action: Bot execution finished.")
 
 if __name__ == "__main__":
-    # Ostrzeżenie o wyłączeniu weryfikacji SSL, jeśli używane jest `verify=False` w `requests.get`
-    if 'requests' in globals() and hasattr(requests, 'packages') and hasattr(requests.packages, 'urllib3'):
-        try:
-            # Wyłączenie ostrzeżeń InsecureRequestWarning, ponieważ verify=False jest używane celowo (choć niezalecane)
-            requests.packages.urllib3.disable_warnings(requests.packages.urllib3.exceptions.InsecureRequestWarning)
-            logging.warning("SSL verification is disabled for requests (verify=False). "
-                            "This is not recommended for production environments but used here as in the original script.")
-        except AttributeError:
-            # Na wypadek gdyby struktura requests.packages.urllib3 się zmieniła
-            logging.warning("Could not disable InsecureRequestWarning for requests.")
-            pass
     main()
